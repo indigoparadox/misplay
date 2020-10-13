@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import epd2in13
+from . import epd2in13
 import time
 import PIL
 import traceback
@@ -18,9 +18,12 @@ FIFO_Y = 60
 
 class Misplay( object ):
 
-    def __init__( self ):
+    def __init__( self, config_path ):
+        logger = logging.getLogger( 'misplay.init' )
+        logger.info( 'using config at {}'.format( config_path ) )
         self.config = configparser.ConfigParser()
-        self.config.read( '/etc/misplay.ini' )
+        self.config.read( config_path )
+        self.config_path = config_path
         self.epd = epd2in13.EPD()
         self.canvas = PIL.Image.new( \
             '1', (epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH), 255 )
@@ -37,6 +40,8 @@ class Misplay( object ):
         #        raise
         except FileExistsError as e:
             pass
+
+        self.clear()
 
     def clear( self ):
         self.epd.init( self.epd.lut_full_update )
@@ -107,7 +112,7 @@ class Misplay( object ):
             self.wp_countup += elapsed
 
             # Update config.
-            self.config.read( '/etc/misplay.ini' )
+            self.config.read( self.config_path )
             wp_int = self.config.getint( 'display', 'wallpapers-interval' )
             wp_path = self.config['display']['wallpapers-path']
 
@@ -128,7 +133,7 @@ class Misplay( object ):
 
             if fifo_buf:
                 fifo_buf = fifo_buf.decode( 'utf-8' )
-                status.text( fifo_buf, (TIME_X, FIFO_Y) )
+                self.text( fifo_buf, (TIME_X, FIFO_Y) )
 
             # Change the image on wallpapers-interval seconds.
             if wp_int <= self.wp_countup:
@@ -141,29 +146,21 @@ class Misplay( object ):
 
                 # Blackout the image area to prevent artifacts.
                 draw = ImageDraw.Draw( self.canvas )
-                status.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
+                self.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
                     draw, 0 )
                 self.update()
-                status.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
+                self.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
                     draw, 127 )
                 self.update()
 
                 # Draw the new wallpaper.
-                status.image( entry_path )
+                self.image( entry_path )
 
             # Update time display.
-            status.text( time.strftime( '%H:%M' ), (TIME_X, TIME_Y) )
+            self.text( time.strftime( '%H:%M' ), (TIME_X, TIME_Y) )
 
             # Sleep.
             logger.debug( 'sleeping for {} seconds...'.format(
                 self.config.getint( 'display', 'refresh' ) ) )
             time.sleep( self.config.getint( 'display', 'refresh' ) )
-
-if '__main__' == __name__:
-
-    logging.basicConfig( level=logging.INFO )
-
-    status = Misplay()
-    status.clear()
-    status.loop()
 

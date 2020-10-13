@@ -1,0 +1,10 @@
+[Unit]
+Description=Miscellaneous Display
+
+[Service]
+Type=simple
+ExecStart=/usr/local/share/misplay/run.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
