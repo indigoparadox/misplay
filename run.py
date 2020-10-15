@@ -3,6 +3,13 @@
 from misplay.misplay import Misplay
 import logging
 import os
+import atexit
+
+status = None
+
+@atexit.register
+def shutdown_display():
+    status.clear()
 
 if '__main__' == __name__:
 

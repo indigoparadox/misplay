@@ -19,25 +19,30 @@ FIFO_Y = 60
 class Misplay( object ):
 
     def __init__( self, config_path ):
+
         logger = logging.getLogger( 'misplay.init' )
+
+        # Load config.
         logger.info( 'using config at {}'.format( config_path ) )
         self.config = configparser.ConfigParser()
         self.config.read( config_path )
         self.config_path = config_path
-        self.epd = epd2in13.EPD()
-        self.canvas = PIL.Image.new( \
-            '1', (epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH), 255 )
-        self.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH, fill=255 )
+        self.display_type = self.config['display']['type']
+
+        # Setup display.
+        logger.info( 'setting up display {}'.format( self.display_type ) )
+        if 'epd2in13' == self.display_type:
+            self.epd = epd2in13.EPD()
+            self.canvas = PIL.Image.new( \
+                '1', (epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH), 255 )
+
+        # Setup wallpaper timers.
         self.last_update = int( time.time() )
         self.wp_countup = \
             self.config.getint( 'display', 'wallpapers-interval' )
 
         try:
             os.mkfifo( self.config['ipc']['fifo'] )
-        #except OSError as e:
-        #    # If it exists then we're fine.
-        #    if errno.EEXIST != e:
-        #        raise
         except FileExistsError as e:
             pass
 
@@ -47,11 +52,11 @@ class Misplay( object ):
         self.epd.init( self.epd.lut_full_update )
         self.epd.Clear( 0xFF )
 
-    def image( self, path, pos=(0, 0), width=80, erase=True ):
+    def image( self, path, pos=(0, 0), width=80, height=100, erase=True ):
         self.epd.init( self.epd.lut_partial_update )
   
         bmp = PIL.Image.open( path )
-        bmp.thumbnail( (width, epd2in13.EPD_HEIGHT) )
+        bmp.thumbnail( (width, height) )
         draw = ImageDraw.Draw( self.canvas )
 
         if erase:
@@ -79,8 +84,8 @@ class Misplay( object ):
     def text( self, text, pos, erase=True ):
         self.epd.init( self.epd.lut_partial_update )
 
-        font24 = ImageFont.truetype( self.config['display']['font'],
-          self.config.getint( 'display', 'font-size' ) )
+        font24 = ImageFont.truetype( self.config[self.display_type]['font'],
+          self.config.getint( self.display_type, 'font-size' ) )
         draw = ImageDraw.Draw( self.canvas )
 
         # Erase text area to prevent overlap, then draw text.
@@ -92,7 +97,9 @@ class Misplay( object ):
         self.update()
 
     def update( self ):
-        self.epd.display( self.epd.getbuffer( self.canvas.rotate( 180 ) ) )
+
+        rotate = self.config.getint( self.display_type, 'rotate' )
+        self.epd.display( self.epd.getbuffer( self.canvas.rotate( rotate ) ) )
          
         #self.epd.sleep()
 
@@ -115,8 +122,11 @@ class Misplay( object ):
             self.config.read( self.config_path )
             wp_int = self.config.getint( 'display', 'wallpapers-interval' )
             wp_path = self.config['display']['wallpapers-path']
+            display_w = self.config.getint( self.display_type, 'width' )
+            display_h = self.config.getint( self.display_type, 'height' )
 
-            logger.debug( '{} until wp change'.format( wp_int - self.wp_countup ) )
+            logger.debug(
+                '{} until wp change'.format( wp_int - self.wp_countup ) )
 
             # Use cached fifo path to avoid issues from changing path later.
             fifo_buf = None
@@ -146,15 +156,13 @@ class Misplay( object ):
 
                 # Blackout the image area to prevent artifacts.
                 draw = ImageDraw.Draw( self.canvas )
-                self.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
-                    draw, 0 )
+                self.blank( 0, 0, display_w, display_h, draw, 0 )
                 self.update()
-                self.blank( 0, 0, epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH,
-                    draw, 127 )
+                self.blank( 0, 0, display_w, display_h, draw, 255 )
                 self.update()
 
                 # Draw the new wallpaper.
-                self.image( entry_path )
+                self.image( entry_path, height=display_h )
 
             # Update time display.
             self.text( time.strftime( '%H:%M' ), (TIME_X, TIME_Y) )
