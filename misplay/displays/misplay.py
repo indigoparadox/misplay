@@ -5,6 +5,9 @@ import logging
 
 FIFO_Y = 60
 
+class RefreshException( Exception ):
+    pass
+
 class Misplay( object ):
 
     def __init__( self, fifo_path, refresh, w, h, r, mx, my ):

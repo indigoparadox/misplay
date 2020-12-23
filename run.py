@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
 from misplay.displays.epd2in13 import MisplayEPD2in13
+from misplay.displays.misplay import RefreshException
 import logging
 import os
 import atexit
 import configparser
 
-if '__main__' == __name__:
+@atexit.register
+def shutdown_display():
+    global status
 
-    logging.basicConfig( level=logging.INFO )
-    logger = logging.getLogger( 'main' )
+    status.clear()
 
-    ini_path = os.path.join( os.path.dirname( 
-        os.path.realpath( __file__ ) ), 'misplay.ini' )
+def create_misplay( ini_path ):
+    logger = logging.getLogger( 'create' )
 
     # Load config.
     logger.info( 'using config at {}'.format( ini_path ) )
@@ -31,12 +33,29 @@ if '__main__' == __name__:
     font_fam = config[display_type]['font']
     font_size = config.getint( display_type, 'font-size' )
 
-    status = MisplayEPD2in13(
+    return MisplayEPD2in13(
         fifo_path, dsp_refresh, w, h, r, wp_int, wp_path, font_fam, font_size )
 
-    @atexit.register
-    def shutdown_display():
-        status.clear()
+def main():
+    global status
 
-    status.loop()
+    do_reload = True
+
+    logging.basicConfig( level=logging.INFO )
+    logger = logging.getLogger( 'main' )
+
+    ini_path = os.path.join( os.path.dirname( 
+        os.path.realpath( __file__ ) ), 'misplay.ini' )
+
+    while do_reload:
+        do_reload = False
+        try:
+            status = create_misplay( ini_path )
+            status.loop()
+
+        except RefreshException:
+            do_reload = True
+
+if '__main__' == __name__:
+    main()
 
