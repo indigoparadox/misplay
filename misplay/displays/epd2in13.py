@@ -6,10 +6,10 @@ import logging
 import random
 import os
 
-class MisplayEPD2in13( Misplay ):
+class EPD2in13( Misplay ):
 
-    def __init__( self, fifo_path, refresh, w, h, r, wp_int, wp_path, font_fam, font_size ):
-        super().__init__( fifo_path, refresh, w, h, r, 120, 80 )
+    def __init__( self, refresh, w, h, r, sources, wp_int, wp_path, font_fam, font_size ):
+        super().__init__( refresh, w, h, r, 120, 80, sources )
 
         self.wp_countup = wp_int
         self.wp_int = wp_int
@@ -103,4 +103,7 @@ class MisplayEPD2in13( Misplay ):
 
             # Draw the new wallpaper.
             self.image( entry_path, height=self.h )
+        else:
+            logger.debug(
+                '{} until wp change'.format( self.wp_int - self.wp_countup ) )
 

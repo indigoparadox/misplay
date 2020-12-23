@@ -10,24 +10,25 @@ class RefreshException( Exception ):
 
 class Misplay( object ):
 
-    def __init__( self, fifo_path, refresh, w, h, r, mx, my ):
+    def __init__( self, refresh, w, h, r, mx, my, sources ):
 
         logger = logging.getLogger( 'misplay.init' )
 
         # Setup wallpaper timers.
         self.last_update = int( time.time() )
-        self.fifo_path = fifo_path
         self.refresh = refresh
         self.w = w
         self.h = h
         self.rotate = r
         self.margin_x = mx
         self.margin_y = my
+        self.sources = sources
+        self._src_buf = None
 
-        try:
-            os.mkfifo( self.fifo_path )
-        except FileExistsError as e:
-            pass
+        for src in self.sources:
+            src.set_misplay( self )
+            logger.info( 'starting {}'.format( type( src ) ) )
+            src.start()
 
     def clear( self ):
         pass
@@ -47,14 +48,14 @@ class Misplay( object ):
     def update( self ):
         pass
 
+    def source_text( self, text ):
+        self._src_buf = text
+
     def loop( self ):
 
         logger = logging.getLogger( 'misplay.loop' )
         logger.setLevel( logging.DEBUG )
 
-        #self.fifo_path = self.config['ipc']['fifo']
-        logger.debug( 'opening IPC FIFO {}...'.format( self.fifo_path ) )
-         
         while( True ):
             seconds = int( time.time() )
             elapsed = seconds - self.last_update
@@ -62,37 +63,13 @@ class Misplay( object ):
             logger.debug( '{} seconds elapsed'.format( elapsed ) )
             self.wp_countup += elapsed
 
-            # TODO: Update config w/ exception.
-            #self.config.read( self.config_path )
-            #wp_int = self.config.getint( 'display', 'wallpapers-interval' )
-            #wp_path = self.config['display']['wallpapers-path']
-            #display_w = self.config.getint( self.display_type, 'width' )
-            #display_h = self.config.getint( self.display_type, 'height' )
-
-            #logger.debug(
-            #    '{} until wp change'.format( wp_int - self.wp_countup ) )
-
-            # Use cached fifo path to avoid issues from changing path later.
-            fifo_buf = None
-            fifo_buf_sz = 128
-            fifo_io = os.open( self.fifo_path, os.O_RDONLY | os.O_NONBLOCK )
-            try:
-                fifo_buf = os.read( fifo_io, fifo_buf_sz )
-            except OSError as e:
-                if errno.EAGAIN == e.errno or errno.EWOULDBLOCK == e.errno:
-                    fifo_buf = None
-                else:
-                    raise
-            os.close( fifo_io )
-
-            if fifo_buf:
-                fifo_buf = fifo_buf.decode( 'utf-8' )
-                self.text( fifo_buf, (self.margin_x, FIFO_Y) )
 
             self.update()
 
             # Update time display.
             self.text( time.strftime( '%H:%M' ), (self.margin_x, self.margin_y) )
+            if self._src_buf:
+                self.text( self._src_buf, (self.margin_x, FIFO_Y) )
 
             # Sleep.
             logger.debug( 'sleeping for {} seconds...'.format( self.refresh ) )
