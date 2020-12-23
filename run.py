@@ -68,9 +68,10 @@ def create_misplay( ini_path, sources ):
     r = config.getint( display_type, 'rotate' )
     font_fam = config[display_type]['font']
     font_size = config.getint( display_type, 'font-size' )
+    msg_ttl = config.getint( 'ipc', 'msg-ttl' )
 
     return EPD2in13(
-        dsp_refresh, w, h, r, sources, wp_int, wp_path, font_fam, font_size )
+        dsp_refresh, w, h, r, sources, msg_ttl, wp_int, wp_path, font_fam, font_size )
 
 def main():
     global status
@@ -100,7 +101,7 @@ def main():
         try:
             sources = []
             sources.append( create_fifo( ini_path ) )
-            #src = create_mqtt( ini_path )
+            #sources.append( create_mqtt( ini_path ) )
             status = create_misplay( ini_path, sources )
             status.loop()
 

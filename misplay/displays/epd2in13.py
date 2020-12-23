@@ -8,8 +8,8 @@ import os
 
 class EPD2in13( Misplay ):
 
-    def __init__( self, refresh, w, h, r, sources, wp_int, wp_path, font_fam, font_size ):
-        super().__init__( refresh, w, h, r, 120, 80, sources )
+    def __init__( self, refresh, w, h, r, sources, msg_ttl, wp_int, wp_path, font_fam, font_size ):
+        super().__init__( refresh, w, h, r, 120, 80, sources, msg_ttl )
 
         self.wp_countup = wp_int
         self.wp_int = wp_int
@@ -44,8 +44,6 @@ class EPD2in13( Misplay ):
                 pos[0] + bmp.size[0], pos[1] + bmp.size[1]), fill = 255 )
         self.canvas.paste( bmp, (10,10) )
 
-        self.flip()
-
     def blank( self, x, y, w, h, draw=None, fill=255 ):
         self.epd.init( self.epd.lut_partial_update )
 
@@ -73,19 +71,18 @@ class EPD2in13( Misplay ):
             self.blank( pos[0], pos[1], ts[0], ts[1], draw )
         draw.text( pos, text, font = font24, fill = 0 )
 
-        self.flip()
-
     def flip( self ):
 
         self.epd.display( self.epd.getbuffer( self.canvas.rotate( self.rotate ) ) )
          
         #self.epd.sleep()
 
-    def update( self ):
+    def update( self, elapsed ):
 
         logger = logging.getLogger( 'epd2in13.update' )
 
         # Change the image on wallpapers-interval seconds.
+        self.wp_countup += elapsed
         if self.wp_int <= self.wp_countup:
             self.wp_countup = 0
             entry_path = '.'
