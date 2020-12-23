@@ -7,6 +7,7 @@ import logging
 import os
 import atexit
 import configparser
+import argparse
 
 @atexit.register
 def shutdown_display():
@@ -17,7 +18,8 @@ def shutdown_display():
     try:
         status.clear()
     except NameError as e:
-        logger.error( e )
+        #logger.error( e )
+        pass
 
 def create_mqtt( ini_path ):
     logger = logging.getLogger( 'create.source' )
@@ -73,13 +75,25 @@ def create_misplay( ini_path, sources ):
 def main():
     global status
 
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument( '-v', '--verbose', action='store_true' )
+
+    parser.add_argument( '-c', '--config', action='store' )
+
+    args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig( level=logging.DEBUG )
+    else:
+        logging.basicConfig( level=logging.INFO )
+
     do_reload = True
-
-    logging.basicConfig( level=logging.INFO )
     logger = logging.getLogger( 'main' )
-
     ini_path = os.path.join( os.path.dirname( 
         os.path.realpath( __file__ ) ), 'misplay.ini' )
+    if args.config:
+        ini_path = args.config
 
     while do_reload:
         do_reload = False
