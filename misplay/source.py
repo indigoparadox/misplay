@@ -51,26 +51,32 @@ class FIFOSource( MisplaySource ):
             return fifo_buf.decode( 'utf-8' )
         return None
 
+def mqtt_connected( userdata, flags, rc ):
+    logger = logging.getLogger( 'sources.mqtt.connected' )
+    logger.info( 'subscribing to {}/#...'.format( 'epaperpi' ) )
+    self.mqtt.subscribe( '{}/#'.format( 'epaperpi' ) )
+
 class MQTTSource( MisplaySource ):
-    def __init__( self, uid, host, port, topic, ssl, ca ):
+
+    def __init__( self, uid, host, port, topic, use_ssl, ca ):
         super().__init__()
 
         logger = logging.getLogger( 'sources.mqtt' )
 
-        self.mqtt = mqtt_client.Client( uid )
-        #client.on_connect = mqtt_on_connect
+        self.topic = topic
+        self.mqtt = mqtt_client.Client( uid, True, None, mqtt_client.MQTTv31 )
+        self.mqtt.message_callback_add( '{}/msg'.format( self.topic ),
+            self.mqtt_received )
+        logger.info( 'enabling TLS...' )
+        if use_ssl:
+            self.mqtt.tls_set( ca, tls_version=ssl.PROTOCOL_TLSv1_2 )
+        self.mqtt.on_connect = mqtt_connected
         logger.info( 'connecting to MQTT at {}:{}...'.format( host, port ) )
         self.mqtt.connect( host, port )
-        logger.info( 'subscribing to {}/#...'.format( topic ) )
-        if ssl:
-            self.mqtt.tls_set( ca, tls_version=ssl.PROTOCOL_TLSv1_2 )
-        logger.info( 'enabling TLS...' )
-        self.mqtt.subscribe( '{}/#'.format( topic ) )
-        self.mqtt.on_message = self.mqtt_receive
-        self.mqtt.loop_start()
-        logger.info( 'ready.' )
+        self.mqtt.loop_forever()
 
-    def mqtt_receive( self, client, userdata, message ):
-        logger = logging.getLogger( 'sources.mqtt.receive' )
+
+    def mqtt_received( self, client, userdata, message ):
+        logger = logging.getLogger( 'sources.mqtt.received' )
         logger.info( str( message.payload.decode( 'utf-8' ) ) )
 
