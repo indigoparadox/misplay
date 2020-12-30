@@ -1,0 +1,27 @@
+[display]
+wallpapers-path = /usr/local/share/misplay/wallpapers
+wallpapers-interval = 3600
+refresh = 5
+type = epd2in13
+
+[ipc]
+fifo = /tmp/misplay.sock
+msg-ttl = 5
+
+[ipc.mqtt]
+user =
+password = 
+host = 
+port = 8883
+topic =
+uid = 
+ssl = true
+ca = 
+
+[epd2in13]
+height = 122
+width = 250
+rotate = 180
+font = /usr/share/fonts/truetype/wqy/wqy-microhei.ttc
+font-size = 18
+
