@@ -2,7 +2,7 @@
 
 from misplay.displays.epd2in13 import EPD2in13
 from misplay.displays.misplay import RefreshException
-from misplay.source import MQTTSource, FIFOSource
+from misplay.sources.fifo import FIFOSource
 import logging
 import os
 import atexit
