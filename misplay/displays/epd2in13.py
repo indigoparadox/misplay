@@ -9,8 +9,6 @@ import os
 class EPD2in13( Misplay ):
 
     def __init__( self, refresh, w, h, r, sources, panels, msg_ttl ):
-        super().__init__( refresh, w, h, r, 120, 80, sources, panels, msg_ttl )
-
         logger = logging.getLogger( 'misplay.displays.epd2in13' )
 
         # Setup display.
@@ -19,6 +17,8 @@ class EPD2in13( Misplay ):
         self.epd = epd2in13.EPD()
         self.canvas = Image.new( \
             '1', (epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH), 255 )
+
+        super().__init__( refresh, w, h, r, 120, 80, sources, panels, msg_ttl )
 
         self.clear()
 
@@ -60,10 +60,14 @@ class EPD2in13( Misplay ):
         draw = ImageDraw.Draw( self.canvas )
 
         # Erase text area to prevent overlap, then draw text.
-        ts = font.getsize( text )
-        if erase:
-            self.blank( position[0], position[1], ts[0], ts[1], draw )
-        draw.text( position, text, font = font, fill = 0 )
+        ts = font.getsize( 'X' )
+        if text:
+            ts = font.getsize( text )
+            if erase:
+                self.blank( position[0], position[1], ts[0], ts[1], draw )
+            draw.text( position, text, font = font, fill = 0 )
+
+        return ts
 
     def flip( self ):
 

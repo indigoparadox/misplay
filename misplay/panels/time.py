@@ -1,17 +1,13 @@
 
 import time
-from .panel import MisplayPanel
+from .panel import TextPanel
 
-class TimePanel( MisplayPanel ):
+class TimePanel( TextPanel ):
 
-    def __init__( self, panel, width=0, height=0, font=None, size=0 ):
-        super().__init__( width, height )
-        self.font_family = font
-        self.font_size = int( size )
+    def __init__( self, panel, font, size ):
+        super().__init__( 0, 0, font, size, 1 )
 
     def update( self, elapsed ):
         # Update time display.
-        self.display.text( time.strftime( '%H:%M' ),
-            self.font_family, self.font_size,
-            (self.x, self.y) )
+        self.text( time.strftime( '%H:%M' ), 0 )
 
