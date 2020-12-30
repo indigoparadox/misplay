@@ -3,6 +3,7 @@
 from misplay.displays.epd2in13 import EPD2in13
 from misplay.displays.misplay import RefreshException
 from misplay.sources.fifo import FIFOSource
+from misplay.panels.panel import RowsPanel
 import logging
 import os
 import atexit
@@ -50,6 +51,30 @@ def create_fifo( ini_path ):
 
     return FIFOSource( fifo_path )
 
+def create_panels( ini_path, panel_keys, parent=None ):
+
+    logger = logging.getLogger( 'create.panels' )
+
+    config = configparser.ConfigParser()
+    config.read( ini_path )
+
+    panels = []
+    for c in panel_keys:
+        logger.info( 'creating panel for {}...'.format( c ) )
+        panel_cfg = dict( config.items( 'panel-{}'.format( c ) ) )
+        panel =  None
+        if 'wallpaper' == panel_cfg['panel']:
+            from misplay.panels.wallpaper import WallpaperPanel
+            panel = WallpaperPanel( **panel_cfg )
+        elif 'time' == panel_cfg['panel']:
+            from misplay.panels.time import TimePanel
+            panel = TimePanel( **panel_cfg )
+        elif 'rows' == panel_cfg['panel']:
+            panel = RowsPanel( **panel_cfg )
+            child_keys = panel_cfg['rows'].split( ',' )
+            create_panels( ini_path, child_keys, panel.rows )
+        parent.append( panel )
+
 def create_misplay( ini_path, sources ):
     logger = logging.getLogger( 'create.misplay' )
 
@@ -58,20 +83,24 @@ def create_misplay( ini_path, sources ):
 
     config = configparser.ConfigParser()
     config.read( ini_path )
-    wp_interval = config.getint( 'display', 'wallpapers-interval' )
+    #wp_interval = config.getint( 'display', 'wallpapers-interval' )
     dsp_refresh = config.getint( 'display', 'refresh' )
-    wp_int = config.getint( 'display', 'wallpapers-interval' )
-    wp_path = config['display']['wallpapers-path']
+    #wp_int = config.getint( 'display', 'wallpapers-interval' )
+    #wp_path = config['display']['wallpapers-path']
     display_type = 'epd2in13'
     w = config.getint( display_type, 'width' )
     h = config.getint( display_type, 'height' )
     r = config.getint( display_type, 'rotate' )
-    font_fam = config[display_type]['font']
-    font_size = config.getint( display_type, 'font-size' )
+    #font_fam = config[display_type]['font']
+    #font_size = config.getint( display_type, 'font-size' )
     msg_ttl = config.getint( 'ipc', 'msg-ttl' )
 
+    col_keys = config['display']['columns'].split( ',' )
+    panels = []
+    create_panels( ini_path, col_keys, panels )
+
     return EPD2in13(
-        dsp_refresh, w, h, r, sources, msg_ttl, wp_int, wp_path, font_fam, font_size )
+        dsp_refresh, w, h, r, sources, panels, msg_ttl )
 
 def main():
     global status

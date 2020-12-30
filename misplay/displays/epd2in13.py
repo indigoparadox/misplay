@@ -8,15 +8,9 @@ import os
 
 class EPD2in13( Misplay ):
 
-    def __init__( self, refresh, w, h, r, sources, msg_ttl, wp_int, wp_path, font_fam, font_size ):
-        super().__init__( refresh, w, h, r, 120, 80, sources, msg_ttl )
+    def __init__( self, refresh, w, h, r, sources, panels, msg_ttl ):
+        super().__init__( refresh, w, h, r, 120, 80, sources, panels, msg_ttl )
 
-        self.wp_countup = wp_int
-        self.wp_int = wp_int
-        self.wp_path = wp_path
-        self.font_fam = font_fam
-        self.font_size = font_size
-        
         logger = logging.getLogger( 'misplay.displays.epd2in13' )
 
         # Setup display.
@@ -59,17 +53,17 @@ class EPD2in13( Misplay ):
         if do_flip:
             self.flip()
 
-    def text( self, text, pos, erase=True ):
+    def text( self, text, font_family, font_size, position, erase=True ):
         self.epd.init( self.epd.lut_partial_update )
 
-        font24 = ImageFont.truetype( self.font_fam, self.font_size )
+        font = ImageFont.truetype( font_family, font_size )
         draw = ImageDraw.Draw( self.canvas )
 
         # Erase text area to prevent overlap, then draw text.
-        ts = font24.getsize( text )
+        ts = font.getsize( text )
         if erase:
-            self.blank( pos[0], pos[1], ts[0], ts[1], draw )
-        draw.text( pos, text, font = font24, fill = 0 )
+            self.blank( position[0], position[1], ts[0], ts[1], draw )
+        draw.text( position, text, font = font, fill = 0 )
 
     def flip( self ):
 
@@ -78,29 +72,5 @@ class EPD2in13( Misplay ):
         #self.epd.sleep()
 
     def update( self, elapsed ):
-
-        logger = logging.getLogger( 'epd2in13.update' )
-
-        # Change the image on wallpapers-interval seconds.
-        self.wp_countup += elapsed
-        if self.wp_int <= self.wp_countup:
-            self.wp_countup = 0
-            entry_path = '.'
-            while '.' == entry_path[0]:
-                entry_iter = random.choice( os.listdir( self.wp_path ) )
-                entry_path = os.path.join( self.wp_path, entry_iter )
-            logger.debug( 'selecting image: {}'.format( entry_path ) )
-
-            # Blackout the image area to prevent artifacts.
-            draw = ImageDraw.Draw( self.canvas )
-            self.blank( 0, 0, self.w, self.h, draw, 0 )
-            self.flip()
-            self.blank( 0, 0, self.w, self.h, draw, 255 )
-            self.flip()
-
-            # Draw the new wallpaper.
-            self.image( entry_path, height=self.h )
-        else:
-            logger.debug(
-                '{} until wp change'.format( self.wp_int - self.wp_countup ) )
+        pass
 
