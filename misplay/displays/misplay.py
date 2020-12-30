@@ -15,7 +15,7 @@ class Misplay( object ):
 
         # Setup wallpaper timers.
         self.last_update = int( time.time() )
-        self.refresh = int( refresh )
+        self.refresh = float( refresh )
         self.w = int( w )
         self.h = int( h )
         self.rotate = int( r )
@@ -46,7 +46,11 @@ class Misplay( object ):
                 # Panels are rows by default, so increment Y.
                 y_iter += panel.h
                 y_iter += self.margins
-                last_width = panel.w
+
+            last_width = panel.w
+            if 0 == panel.w:
+                logger.debug( 'auto-setting panel width to {}'.format(
+                    parent_width ) )
 
     def _update_panels( self, panels, elapsed ):
         logger = logging.getLogger( 'misplay.panels' )

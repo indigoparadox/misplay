@@ -5,7 +5,7 @@ from .panel import TextPanel
 class TimePanel( TextPanel ):
 
     def __init__( self, panel, font, size ):
-        super().__init__( 0, 0, font, size, 1 )
+        super().__init__( 0, 0, font, size )
 
     def update( self, elapsed ):
         # Update time display.

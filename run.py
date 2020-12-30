@@ -63,6 +63,9 @@ def create_panels( ini_path, panel_keys, parent=None ):
         elif 'ipc' == panel_cfg['panel']:
             from misplay.panels.ipc import IPCPanel
             panel = IPCPanel( **panel_cfg )
+        elif 'mpd' == panel_cfg['panel']:
+            from misplay.panels.mpd import MPDPanel
+            panel = MPDPanel( **panel_cfg )
         parent.append( panel )
 
 def create_misplay( ini_path ):
