@@ -9,7 +9,7 @@ class RefreshException( Exception ):
 
 class Misplay( object ):
 
-    def __init__( self, refresh, w, h, r, margins, panels ):
+    def __init__( self, refresh, w, h, r, margins, panels, font, size ):
 
         logger = logging.getLogger( 'misplay.init' )
 
@@ -21,6 +21,8 @@ class Misplay( object ):
         self.rotate = int( r )
         self.margins = int( margins )
         self.panels = panels
+        self.font_family = font
+        self.font_size = int( size )
         self._populate_panels( self.panels, 0, 0 )
 
     def _populate_panels( self, panels, x_iter, y_iter, parent_width=0 ):

@@ -6,7 +6,7 @@ from datetime import datetime
 
 class IPCPanel( TextPanel ):
 
-    def __init__( self, panel, font, size, lines, sources, ttl, fifo=None ):
+    def __init__( self, panel, lines, sources, ttl, font=None, size=0, fifo=None ):
         super().__init__( 0, 0, font, size, lines )
 
         self.ttl = ttl

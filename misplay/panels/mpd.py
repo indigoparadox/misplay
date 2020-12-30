@@ -5,7 +5,7 @@ from mpd import MPDClient
 
 class MPDPanel( TextPanel ):
 
-    def __init__( self, panel, font, size, mpd ):
+    def __init__( self, panel, mpd, font=None, size =0 ):
         super().__init__( 0, 0, font, size, 2 )
 
         self.mpc = MPDClient()

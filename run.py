@@ -2,7 +2,7 @@
 
 from misplay.displays.epd2in13 import EPD2in13
 from misplay.displays.misplay import RefreshException
-from misplay.panels.panel import RowsPanel
+from misplay.panels.panel import RowsPanel, TextPanel
 import logging
 import os
 import atexit
@@ -66,6 +66,8 @@ def create_panels( ini_path, panel_keys, parent=None ):
         elif 'mpd' == panel_cfg['panel']:
             from misplay.panels.mpd import MPDPanel
             panel = MPDPanel( **panel_cfg )
+        elif 'text' == panel_cfg['panel']:
+            panel = TextPanel( **panel_cfg )
         parent.append( panel )
 
 def create_misplay( ini_path ):

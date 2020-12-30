@@ -12,13 +12,14 @@ class MisplayPanel( object ):
         self.y = 0
 
 class TextPanel( MisplayPanel ):
-    def __init__( self, width, height, font, size, lines=1 ):
+    def __init__( self, width=0, height=0, font=None, size=0, lines=1, text=None, panel=None ):
         super().__init__( width, height )
         self.lines = int( lines )
         self.font_family = font
         self.font_size = int( size )
         self._display = None
         self._line_height = 0
+        self._static_text = text
 
     @property
     def display( self ):
@@ -28,6 +29,10 @@ class TextPanel( MisplayPanel ):
     def display( self, value ):
         logger = logging.getLogger( 'panel.text' )
         if value:
+            if not self.font_family:
+                self.font_family = value.font_family
+            if not self.font_size:
+                self.font_size = value.font_size
             text_sz = value.text( None, self.font_family, self.font_size, None )
             self._line_height = text_sz[1]
             self.h = (self._line_height + value.margins) * (self.lines)
@@ -41,6 +46,10 @@ class TextPanel( MisplayPanel ):
         self.display.blank( self.x, line_y, self.w, self.h, fill=255 )
         self.display.text(
             text, self.font_family, self.font_size, (self.x, line_y) )
+
+    def update( self, elapsed ):
+        if self._static_text:
+            self.text( self._static_text, 0 )
 
 class RowsPanel( MisplayPanel ):
     def __init__( self, width, height, panel, rows ):
