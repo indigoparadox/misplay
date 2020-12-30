@@ -38,18 +38,6 @@ def create_mqtt( ini_path ):
 
     return MQTTSource( uid, host, port, topic, ssl, ca )
 
-def create_fifo( ini_path ):
-    logger = logging.getLogger( 'create.source' )
-
-    # Load config.
-    logger.info( 'using config at {}'.format( ini_path ) )
-
-    config = configparser.ConfigParser()
-    config.read( ini_path )
-    fifo_path = config['ipc']['fifo']
-
-    return FIFOSource( fifo_path )
-
 def create_panels( ini_path, panel_keys, parent=None ):
 
     logger = logging.getLogger( 'create.panels' )
@@ -85,24 +73,18 @@ def create_misplay( ini_path ):
 
     config = configparser.ConfigParser()
     config.read( ini_path )
-    #wp_interval = config.getint( 'display', 'wallpapers-interval' )
-    dsp_refresh = config.getint( 'display', 'refresh' )
-    #wp_int = config.getint( 'display', 'wallpapers-interval' )
-    #wp_path = config['display']['wallpapers-path']
-    display_type = 'epd2in13'
-    w = config.getint( display_type, 'width' )
-    h = config.getint( display_type, 'height' )
-    r = config.getint( display_type, 'rotate' )
-    #font_fam = config[display_type]['font']
-    #font_size = config.getint( display_type, 'font-size' )
-    #msg_ttl = config.getint( 'ipc', 'msg-ttl' )
+
+    display_cfg = dict( config.items( 'display' ) )
+    display_cfg.update( dict( config.items( display_cfg['type'] ) ) )
 
     col_keys = config['display']['columns'].split( ',' )
-    panels = []
-    create_panels( ini_path, col_keys, panels )
+    display_cfg['panels'] = []
+    create_panels( ini_path, col_keys, display_cfg['panels'] )
 
-    return EPD2in13(
-        dsp_refresh, w, h, r, panels )
+    del display_cfg['type']
+    del display_cfg['columns']
+
+    return EPD2in13( **display_cfg )
 
 def main():
     global status

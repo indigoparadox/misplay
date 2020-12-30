@@ -8,7 +8,7 @@ import os
 
 class EPD2in13( Misplay ):
 
-    def __init__( self, refresh, width, height, rotate, panels ):
+    def __init__( self, refresh, width, height, rotate, panels, margins ):
         logger = logging.getLogger( 'misplay.displays.epd2in13' )
 
         # Setup display.
@@ -18,7 +18,7 @@ class EPD2in13( Misplay ):
         self.canvas = Image.new( \
             '1', (epd2in13.EPD_HEIGHT, epd2in13.EPD_WIDTH), 255 )
 
-        super().__init__( refresh, width, height, rotate, 120, 80, panels )
+        super().__init__( refresh, width, height, rotate, margins, panels )
 
         self.clear()
 

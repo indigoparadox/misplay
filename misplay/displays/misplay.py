@@ -4,25 +4,22 @@ import time
 import logging
 from misplay.panels.panel import RowsPanel
 
-FIFO_Y = 60
-
 class RefreshException( Exception ):
     pass
 
 class Misplay( object ):
 
-    def __init__( self, refresh, w, h, r, mx, my, panels ):
+    def __init__( self, refresh, w, h, r, margins, panels ):
 
         logger = logging.getLogger( 'misplay.init' )
 
         # Setup wallpaper timers.
         self.last_update = int( time.time() )
-        self.refresh = refresh
-        self.w = w
-        self.h = h
-        self.rotate = r
-        self.margin_x = mx
-        self.margin_y = my
+        self.refresh = int( refresh )
+        self.w = int( w )
+        self.h = int( h )
+        self.rotate = int( r )
+        self.margins = int( margins )
         self.panels = panels
         self._populate_panels( self.panels, 0, 0 )
 
@@ -33,8 +30,9 @@ class Misplay( object ):
         last_width = 0
         for panel in panels:
             if isinstance( panel, RowsPanel ):
-                y_iter = 0
+                y_iter = self.margins
                 x_iter += last_width
+                x_iter += self.margins
                 logger.debug( 'populating {} at {}, {}...'.format(
                     type( panel ), x_iter, y_iter ) )
                 self._populate_panels( panel.rows, x_iter, y_iter, panel.w )
@@ -47,6 +45,7 @@ class Misplay( object ):
 
                 # Panels are rows by default, so increment Y.
                 y_iter += panel.h
+                y_iter += self.margins
                 last_width = panel.w
 
     def _update_panels( self, panels, elapsed ):
