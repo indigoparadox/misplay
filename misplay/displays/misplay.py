@@ -2,7 +2,6 @@
 import os
 import time
 import logging
-from datetime import datetime
 from misplay.panels.panel import RowsPanel
 
 FIFO_Y = 60
@@ -12,7 +11,7 @@ class RefreshException( Exception ):
 
 class Misplay( object ):
 
-    def __init__( self, refresh, w, h, r, mx, my, sources, panels, msg_ttl ):
+    def __init__( self, refresh, w, h, r, mx, my, panels ):
 
         logger = logging.getLogger( 'misplay.init' )
 
@@ -24,9 +23,6 @@ class Misplay( object ):
         self.rotate = r
         self.margin_x = mx
         self.margin_y = my
-        self.sources = sources
-        self.messages = []
-        self.msg_ttl = msg_ttl
         self.panels = panels
         self._populate_panels( self.panels, 0, 0 )
 
@@ -77,9 +73,6 @@ class Misplay( object ):
     def flip( self ):
         pass
 
-    def update( self, elapsed ):
-        pass
-
     def loop( self ):
 
         logger = logging.getLogger( 'misplay.loop' )
@@ -89,24 +82,6 @@ class Misplay( object ):
             elapsed = seconds - self.last_update
             self.last_update = int( time.time() )
             logger.debug( '{} seconds elapsed'.format( elapsed ) )
-
-            # Call implementation-specific update.
-            self.update( elapsed )
-
-            for src in self.sources:
-                logger.debug( 'polling source {}'.format( type( src ) ) )
-                buf = src.poll()
-                if buf:
-                    logger.debug( 'msg found: {}'.format( buf ) )
-                    msg = {'msg': buf, 'timestamp': datetime.now()}
-                    self.messages.append( msg )
-                else:
-                    logger.debug( 'no messages' )
-
-            # Show message if any.
-            # TODO
-            #if 0 < len( self.messages ):
-            #    self.text( self.messages[0]['msg'], (self.margin_x, FIFO_Y) )
 
             self._update_panels( self.panels, elapsed )
 

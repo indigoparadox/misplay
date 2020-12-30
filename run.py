@@ -2,7 +2,6 @@
 
 from misplay.displays.epd2in13 import EPD2in13
 from misplay.displays.misplay import RefreshException
-from misplay.sources.fifo import FIFOSource
 from misplay.panels.panel import RowsPanel
 import logging
 import os
@@ -73,9 +72,12 @@ def create_panels( ini_path, panel_keys, parent=None ):
             panel = RowsPanel( **panel_cfg )
             child_keys = panel_cfg['rows'].split( ',' )
             create_panels( ini_path, child_keys, panel.rows )
+        elif 'ipc' == panel_cfg['panel']:
+            from misplay.panels.ipc import IPCPanel
+            panel = IPCPanel( **panel_cfg )
         parent.append( panel )
 
-def create_misplay( ini_path, sources ):
+def create_misplay( ini_path ):
     logger = logging.getLogger( 'create.misplay' )
 
     # Load config.
@@ -93,14 +95,14 @@ def create_misplay( ini_path, sources ):
     r = config.getint( display_type, 'rotate' )
     #font_fam = config[display_type]['font']
     #font_size = config.getint( display_type, 'font-size' )
-    msg_ttl = config.getint( 'ipc', 'msg-ttl' )
+    #msg_ttl = config.getint( 'ipc', 'msg-ttl' )
 
     col_keys = config['display']['columns'].split( ',' )
     panels = []
     create_panels( ini_path, col_keys, panels )
 
     return EPD2in13(
-        dsp_refresh, w, h, r, sources, panels, msg_ttl )
+        dsp_refresh, w, h, r, panels )
 
 def main():
     global status
@@ -128,10 +130,7 @@ def main():
     while do_reload:
         do_reload = False
         try:
-            sources = []
-            sources.append( create_fifo( ini_path ) )
-            #sources.append( create_mqtt( ini_path ) )
-            status = create_misplay( ini_path, sources )
+            status = create_misplay( ini_path )
             status.loop()
 
         except RefreshException:
