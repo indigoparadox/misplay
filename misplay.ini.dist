@@ -1,27 +1,55 @@
 [display]
-wallpapers-path = /usr/local/share/misplay/wallpapers
-wallpapers-interval = 3600
-refresh = 5
+refresh = 0.5
 type = epd2in13
+columns = wp,rows
+margins = 3
+font = /usr/share/fonts/truetype/wqy/wqy-microhei.ttc
+size = 13
 
-[ipc]
+[panel-btns]
+panel = text
+text = Pl-Pau, VolUp, VolDn
+
+[panel-wp]
+panel = wallpaper
+path = /usr/local/share/misplay/wallpapers
+interval = 3600
+width = 80
+height = 100
+
+[panel-rows]
+panel = rows
+rows = btns,time,mpd,ipc
+width = 170
+height = 122
+
+[panel-time]
+panel = time
+size = 18
+dtsize = 14
+date = true
+
+[panel-mpd]
+panel = mpd
+mpd = /run/mpd/socket
+
+[panel-ipc]
+panel = ipc
+sources = fifo
 fifo = /tmp/misplay.sock
-msg-ttl = 5
-
-[ipc.mqtt]
-user =
-password = 
-host = 
-port = 8883
-topic =
-uid = 
-ssl = true
-ca = 
+ttl = 5
+lines = 1
+mqttuser =
+mqttpassword = 
+mqtthost = 
+mqttport = 8883
+mqtttopic =
+mqttuid = 
+mqttssl = true
+mqttca = 
 
 [epd2in13]
 height = 122
 width = 250
-rotate = 180
-font = /usr/share/fonts/truetype/wqy/wqy-microhei.ttc
-font-size = 18
+rotate = 0
 
