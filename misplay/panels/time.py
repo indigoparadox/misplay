@@ -5,17 +5,18 @@ from .panel import TextPanel
 
 class TimePanel( TextPanel ):
 
-    def __init__( self, panel, font=None, size=0, date=False, dtsize=0 ):
+    def __init__( self, **kwargs ):
         logger = logging.getLogger( 'panel.time' )
-        super().__init__( 0, 0, font, size )
-        self.date_size = int( dtsize )
-        if 'true' == date:
+        super().__init__( **kwargs )
+        self.date_size = int( kwargs['dtsize'] ) if 'dtsize' in kwargs else 0
+        if 'date' in kwargs and 'true' == kwargs['date']:
             logger.debug( 'date display enabled' )
             self.show_date = True
             self.lines = 2
         else:
             logger.debug( 'date display disabled' )
             self.show_date = False
+            self.lines = 1
 
     def line_height( self, line_idx ):
         logger = logging.getLogger( 'panel.time.height.line' )

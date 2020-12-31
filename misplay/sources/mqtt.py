@@ -10,12 +10,13 @@ def mqtt_connected( userdata, flags, rc ):
 
 class MQTTSource( MisplaySource ):
 
-    def __init__( self, uid, host, port, topic, use_ssl, ca ):
+    def __init__( self, mqttuid, mqtthost, mqttport, mqtttopic, mqttssl, mqttca ):
         super().__init__()
 
         logger = logging.getLogger( 'sources.mqtt' )
 
         self.topic = topic
+        self.mqtt.enable_logger()
         self.mqtt = mqtt_client.Client( uid, True, None, mqtt_client.MQTTv31 )
         self.mqtt.message_callback_add( '{}/msg'.format( self.topic ),
             self.mqtt_received )

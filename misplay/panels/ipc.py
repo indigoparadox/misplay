@@ -1,20 +1,23 @@
 
 import logging
-from misplay.sources.fifo import FIFOSource
 from .panel import TextPanel
 from datetime import datetime
 
 class IPCPanel( TextPanel ):
 
-    def __init__( self, panel, lines, sources, ttl, font=None, size=0, fifo=None ):
-        super().__init__( 0, 0, font, size, lines )
+    def __init__( self, **kwargs ):
+        super().__init__( **kwargs )
 
-        self.ttl = ttl
+        self.ttl = kwargs['ttl'] if 'ttl' in kwargs else 0
         self.messages = []
         self.sources = []
-        for src in sources:
-            if 'fifo' in sources and fifo:
-                self.sources.append( FIFOSource( fifo ) )
+        sources = kwargs['sources'].split( ',' )
+        if 'fifo' in sources:
+            from misplay.sources.fifo import FIFOSource
+            self.sources.append( FIFOSource( **kwargs ) )
+        if 'mqtt' in sources:
+            from misplay.sources.mqtt import MQTTSource
+            self.sources.append( MQTTSource( **kwargs ) )
 
     def update( self, elapsed ):
         logger = logging.getLogger( 'ipc.update' )

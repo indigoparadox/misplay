@@ -8,12 +8,11 @@ from .panel import MisplayPanel
 
 class WallpaperPanel( MisplayPanel ):
 
-    def __init__( self, panel, width, height, path, interval ):
-        super().__init__( width, height )
-        self.path = path
-        self.wp_countup = int( interval )
-        self.wp_int = int( interval )
-        self.wp_path = path
+    def __init__( self, **kwargs ):
+        super().__init__( **kwargs )
+        self.path = kwargs['path']
+        self.wp_countup = int( kwargs['interval'] )
+        self.wp_int = int( kwargs['interval'] )
 
     def update( self, elapsed ):
         logger = logging.getLogger( 'wallpaper.update' )
@@ -24,8 +23,8 @@ class WallpaperPanel( MisplayPanel ):
             self.wp_countup = 0
             entry_path = '.'
             while '.' == entry_path[0]:
-                entry_iter = random.choice( os.listdir( self.wp_path ) )
-                entry_path = os.path.join( self.wp_path, entry_iter )
+                entry_iter = random.choice( os.listdir( self.path ) )
+                entry_path = os.path.join( self.path, entry_iter )
             logger.debug( 'selecting image: {}'.format( entry_path ) )
 
             # Blackout the image area to prevent artifacts.

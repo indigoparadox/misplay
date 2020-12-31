@@ -2,9 +2,11 @@
 import logging
 
 class MisplayPanel( object ):
-    def __init__( self, w, h ):
-        self.w = int( w )
-        self.h = int( h )
+    def __init__( self, **kwargs ):
+        self.w = int( kwargs['w'] ) if 'w' in kwargs else \
+            int( kwargs['width'] ) if 'width' in kwargs else 0
+        self.h = int( kwargs['h'] ) if 'h' in kwargs else \
+            int( kwargs['height'] ) if 'height' in kwargs else 0
 
         # These will be set by the display.
         self.display = None
@@ -12,13 +14,14 @@ class MisplayPanel( object ):
         self.y = 0
 
 class TextPanel( MisplayPanel ):
-    def __init__( self, width=0, height=0, font=None, size=0, lines=1, text=None, panel=None ):
-        super().__init__( width, height )
-        self.lines = int( lines )
-        self.font_family = font
-        self.font_size = int( size )
+    def __init__( self, **kwargs ):
+        #width=0, height=0, font=None, size=0, lines=1, text=None, panel=None ):
+        super().__init__( **kwargs )
+        self.lines = int( kwargs['lines'] ) if 'lines' in kwargs else 1
+        self.font_family = kwargs['font'] if 'font' in kwargs else None
+        self.font_size = int( kwargs['size'] ) if 'size' in kwargs else 0
         self._display = None
-        self._static_text = text
+        self._static_text = kwargs['text'] if 'text' in kwargs else None
 
     @property
     def display( self ):
@@ -84,7 +87,7 @@ class TextPanel( MisplayPanel ):
             self.text( self._static_text, 0 )
 
 class RowsPanel( MisplayPanel ):
-    def __init__( self, width, height, panel, rows ):
-        super().__init__( width, height )
+    def __init__( self, **kwargs ):
+        super().__init__( **kwargs )
         self.rows = []
 

@@ -5,13 +5,14 @@ from mpd import MPDClient
 
 class MPDPanel( TextPanel ):
 
-    def __init__( self, panel, mpd, font=None, size =0 ):
-        super().__init__( 0, 0, font, size, 2 )
+    def __init__( self, **kwargs ):
+        super().__init__( **kwargs )
 
         self.mpc = MPDClient()
         self.mpc.idletimeout = None
-        self.mpd_addr = mpd
+        self.mpd_addr = kwargs['mpd']
         self.last_song = None
+        self.lines = 2
 
     def _mpd_command( self, command, *args ):
         self.mpc.connect( self.mpd_addr )

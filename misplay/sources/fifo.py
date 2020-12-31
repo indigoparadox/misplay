@@ -6,10 +6,10 @@ import errno
 from .source import MisplaySource
 
 class FIFOSource( MisplaySource ):
-    def __init__( self, fifo_path ):
+    def __init__( self, **kwargs ):
         super().__init__()
         logger = logging.getLogger( 'sources.fifo' )
-        self._fifo_path = fifo_path
+        self._fifo_path = kwargs['fifo']
         self.create_fifo()
 
     def create_fifo( self ):
