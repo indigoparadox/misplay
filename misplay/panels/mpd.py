@@ -22,14 +22,16 @@ class MPDPanel( TextPanel ):
     def update( self, elapsed ):
         logger = logging.getLogger( 'mpd.update' )
 
+        
+        # Show song status; don't draw if the song hasn't changed because eink.
         song_changed = False
         mpsong = self._mpd_command( self.mpc.currentsong )
         if self.last_song != mpsong['title']:
             song_changed = True
             self.last_song = mpsong['title']
-
         self.text( mpsong['title'], 0, blank=song_changed )
         
+        # Show player status.
         mpstatus = self._mpd_command( self.mpc.status )
         mpstate = 'Stopped'
         if 'play' == mpstatus['state']:
