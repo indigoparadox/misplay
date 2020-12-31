@@ -40,10 +40,11 @@ class TextPanel( MisplayPanel ):
                 self.h, self._line_height ) )
         self._display = value
 
-    def text( self, text, line=0 ):
+    def text( self, text, line=0, blank=False ):
         margin = line * self.display.margins
         line_y = self.y + (line * self._line_height) + margin
-        self.display.blank( self.x, line_y, self.w, self.h, fill=255 )
+        if blank:
+            self.display.blank( self.x, line_y, self.w, self.h, fill=255 )
         self.display.text(
             text, self.font_family, self.font_size, (self.x, line_y) )
 

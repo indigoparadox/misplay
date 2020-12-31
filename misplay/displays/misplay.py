@@ -49,10 +49,12 @@ class Misplay( object ):
                 y_iter += panel.h
                 y_iter += self.margins
 
-            last_width = panel.w
             if 0 == panel.w:
                 logger.debug( 'auto-setting panel width to {}'.format(
                     parent_width ) )
+                panel.w = parent_width
+
+            last_width = panel.w
 
     def _update_panels( self, panels, elapsed ):
         logger = logging.getLogger( 'misplay.panels' )
