@@ -95,8 +95,12 @@ def main():
     global status
 
     parser = argparse.ArgumentParser()
+
+    verbosity_grp = parser.add_mutually_exclusive_group()
     
-    parser.add_argument( '-v', '--verbose', action='store_true' )
+    verbosity_grp.add_argument( '-v', '--verbose', action='store_true' )
+
+    verbosity_grp.add_argument( '-q', '--quiet', action='store_true' )
 
     parser.add_argument( '-c', '--config', action='store' )
 
@@ -104,6 +108,8 @@ def main():
 
     if args.verbose:
         logging.basicConfig( level=logging.DEBUG )
+    elif args.quiet:
+        logging.basicConfig( level=logging.ERROR )
     else:
         logging.basicConfig( level=logging.INFO )
 
