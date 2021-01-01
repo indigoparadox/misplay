@@ -16,7 +16,7 @@ def shutdown_display():
     logger = logging.getLogger( 'main' )
 
     try:
-        status.clear()
+        status.stop()
     except NameError as e:
         #logger.error( e )
         pass

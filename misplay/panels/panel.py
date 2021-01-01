@@ -13,6 +13,9 @@ class MisplayPanel( object ):
         self.x = 0
         self.y = 0
 
+    def stop( self ):
+        pass
+
 class TextPanel( MisplayPanel ):
     def __init__( self, **kwargs ):
         #width=0, height=0, font=None, size=0, lines=1, text=None, panel=None ):
@@ -43,15 +46,15 @@ class TextPanel( MisplayPanel ):
         self._display = value
         if self._display:
             new_h = self.panel_lines_height()
-            logger.debug( 'setting height to: {}'.format( new_h ) )
+            #logger.debug( 'setting height to: {}'.format( new_h ) )
             self.h = new_h
 
     def line_height( self, line_idx=0 ):
         logger = logging.getLogger( 'panel.text.height.line' )
         text_sz = self.display.text(
             None, self.font_family, self.font_size, None )
-        logger.debug( '{} line {} height: {}'.format( type( self ), line_idx,
-            text_sz[1] ) )
+        #logger.debug( '{} line {} height: {}'.format( type( self ), line_idx,
+        #    text_sz[1] ) )
         return text_sz[1]
 
     def panel_lines_height( self, through=-1 ):
@@ -63,8 +66,8 @@ class TextPanel( MisplayPanel ):
         for line in range( through ):
             height_out += self.line_height( line )
         margins_out = (self.display.margins * through)
-        logger.debug( '{} height for {} lines: {} + {}'.format(
-            type( self ), through, height_out, margins_out ) )
+        #logger.debug( '{} height for {} lines: {} + {}'.format(
+        #    type( self ), through, height_out, margins_out ) )
         return height_out + margins_out
 
     def text( self, text, line=0, blank=False, font_fam=None, font_sz=0 ):

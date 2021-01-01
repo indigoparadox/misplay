@@ -25,6 +25,11 @@ class Misplay( object ):
         self.font_size = int( size )
         self._populate_panels( self.panels, 0, 0 )
 
+    def stop( self ):
+        for pnl in self.panels:
+            pnl.stop()
+        self.clear()
+
     def _populate_panels( self, panels, x_iter, y_iter, parent_width=0 ):
         logger = logging.getLogger( 'misplay.panels' )
         if 0 >= parent_width:
