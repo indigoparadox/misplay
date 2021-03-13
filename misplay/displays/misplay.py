@@ -4,14 +4,14 @@ import time
 import logging
 from misplay.panels.panel import RowsPanel
 
-class RefreshException( Exception ):
-    pass
+#class RefreshException( Exception ):
+#    pass
 
 class Misplay( object ):
 
     def __init__( self, refresh, w, h, r, margins, panels, font, size ):
 
-        logger = logging.getLogger( 'misplay.init' )
+        self.logger = logging.getLogger( 'misplay' )
 
         # Setup wallpaper timers.
         self.last_update = int( time.time() )
@@ -31,7 +31,6 @@ class Misplay( object ):
         self.clear()
 
     def _populate_panels( self, panels, x_iter, y_iter, parent_width=0 ):
-        logger = logging.getLogger( 'misplay.panels' )
         if 0 >= parent_width:
             parent_width = self.w
         last_width = 0
@@ -40,11 +39,11 @@ class Misplay( object ):
                 y_iter = self.margins
                 x_iter += last_width
                 x_iter += self.margins
-                logger.debug( 'populating {} at {}, {}...'.format(
+                self.logger.debug( 'populating {} at {}, {}...'.format(
                     type( panel ), x_iter, y_iter ) )
                 self._populate_panels( panel.rows, x_iter, y_iter, panel.w )
             elif panel:
-                logger.debug( 'populating {} at {}, {}...'.format(
+                self.logger.debug( 'populating {} at {}, {}...'.format(
                     type( panel ), x_iter, y_iter ) )
                 panel.display = self
                 panel.x = x_iter
@@ -55,16 +54,15 @@ class Misplay( object ):
                 y_iter += self.margins
 
             if 0 == panel.w:
-                logger.debug( 'auto-setting panel width to {}'.format(
+                self.logger.debug( 'auto-setting panel width to {}'.format(
                     parent_width ) )
                 panel.w = parent_width
 
             last_width = panel.w
 
     def _update_panels( self, panels, elapsed ):
-        logger = logging.getLogger( 'misplay.panels' )
         for panel in panels:
-            logger.debug( 'updating panel...' )
+            self.logger.debug( 'updating panel...' )
             if isinstance( panel, RowsPanel ):
                 self._update_panels( panel.rows, elapsed )
             elif panel:
@@ -86,21 +84,22 @@ class Misplay( object ):
         pass
 
     def loop( self ):
-
-        logger = logging.getLogger( 'misplay.loop' )
-
         while( True ):
             seconds = int( time.time() )
             elapsed = seconds - self.last_update
             self.last_update = int( time.time() )
-            logger.debug( '{} seconds elapsed'.format( elapsed ) )
+            self.logger.debug( '{} seconds elapsed'.format( elapsed ) )
 
-            self._update_panels( self.panels, elapsed )
+            try:
+                self._update_panels( self.panels, elapsed )
 
-            self.flip()
+                self.flip()
+            except Exception as exc:
+                self.logger.error( '%s during refresh: %s', type( exc ), exc )
 
             # Sleep.
-            logger.debug( 'sleeping for {} seconds...'.format( self.refresh ) )
+            self.logger.debug(
+                'sleeping for {} seconds...'.format( self.refresh ) )
             time.sleep( self.refresh )
 
 

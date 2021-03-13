@@ -2,3 +2,5 @@
 *.swp
 wallpapers
 misplay.ini
+__pycache__
+env

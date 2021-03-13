@@ -28,9 +28,7 @@ class WallpaperPanel( MisplayPanel ):
             logger.debug( 'selecting image: {}'.format( entry_path ) )
 
             # Blackout the image area to prevent artifacts.
-            # TODO: Use display blanking function?
             draw = ImageDraw.Draw( self.display.canvas )
-            # TODO: Get X/Y for drawing this panel from display.
             self.display.blank( 0, 0, self.w, self.h, draw, 0 )
             self.display.flip()
             self.display.blank( 0, 0, self.w, self.h, draw, 255 )

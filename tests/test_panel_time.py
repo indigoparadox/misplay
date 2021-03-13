@@ -35,4 +35,3 @@ class PanelTimeTester( unittest.TestCase ):
 
     def test_panel_lines_height( self ):
         self.assertEqual( self.panel.panel_lines_height(), 37 )
-
