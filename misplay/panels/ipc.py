@@ -1,8 +1,9 @@
 
 import logging
 import threading
-from .panel import TextPanel
 from datetime import datetime
+
+from .panel import TextPanel
 
 class IPCPanel( TextPanel ):
 
@@ -18,15 +19,15 @@ class IPCPanel( TextPanel ):
         sources = kwargs['sources'].split( ',' )
         kwargs['panel'] = self
         if 'fifo' in sources:
-            from misplay.sources.fifo import FIFOSource
+            from misplay.sources.fifo import FIFOSource # pylint: disable=import-error
             self.sources.append( FIFOSource( **kwargs ) )
         if 'mqtt' in sources:
-            from misplay.sources.mqtt import MQTTSource
+            from misplay.sources.mqtt import MQTTSource # pylint: disable=import-error
             self.sources.append( MQTTSource( **kwargs ) )
 
     def add_message( self, msg ):
         logger = logging.getLogger( 'ipc.message.add' )
-        logger.debug( 'msg received: {}'.format( msg ) )
+        logger.debug( 'msg received: %s', msg )
         msg_pkt = {'msg': msg, 'timestamp': datetime.now()}
         with self.msg_lock:
             self.messages.append( msg_pkt )
@@ -39,7 +40,7 @@ class IPCPanel( TextPanel ):
         logger = logging.getLogger( 'ipc.update' )
 
         self.countup += elapsed
-        logger.debug( 'ipc ttl counter: {}'.format( self.countup ) )
+        logger.debug( 'ipc ttl counter: %d', self.countup )
 
         with self.msg_lock:
             # Show message if any.
@@ -47,20 +48,19 @@ class IPCPanel( TextPanel ):
             (self.last_msg != self.messages[0]['msg'] or not self.last_msg):
                 self.last_msg = self.messages[0]['msg']
                 logger.debug(
-                    'displaying message: {}'.format( self.messages[0]['msg'] ) )
+                    'displaying message: %s', self.messages[0]['msg'] )
                 self.text( self.messages[0]['msg'], 0, blank=True )
                 logger.debug(
-                    'reset countup from {} to 0'.format( self.countup ) )
+                    'reset countup from %d to 0', self.countup )
                 self.countup = 0
 
             # Remove expired messages.
             if 0 < len( self.messages ) and \
             self.ttl <= self.countup:
                 logger.debug(
-                    'message expired at {}, removing. {} left.'.format(
-                        self.countup, len( self.messages ) - 1 ) )
+                    'message expired at %d, removing. %d left.',
+                        self.countup, len( self.messages ) - 1 )
                 self.messages.pop( 0 )
                 self.text( ' ', blank=True )
 
             self.countup += elapsed
-

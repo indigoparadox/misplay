@@ -1,8 +1,7 @@
 
-import os
 import time
 import logging
-from misplay.panels.panel import RowsPanel
+from misplay.panels.panel import RowsPanel # pylint: disable=import-error,no-name-in-module
 
 #class RefreshException( Exception ):
 #    pass
@@ -39,12 +38,12 @@ class Misplay( object ):
                 y_iter = self.margins
                 x_iter += last_width
                 x_iter += self.margins
-                self.logger.debug( 'populating {} at {}, {}...'.format(
-                    type( panel ), x_iter, y_iter ) )
+                self.logger.debug( 'populating %s at %d, %d...',
+                    type( panel ), x_iter, y_iter )
                 self._populate_panels( panel.rows, x_iter, y_iter, panel.w )
             elif panel:
-                self.logger.debug( 'populating {} at {}, {}...'.format(
-                    type( panel ), x_iter, y_iter ) )
+                self.logger.debug( 'populating %s at %d, %d...',
+                    type( panel ), x_iter, y_iter )
                 panel.display = self
                 panel.x = x_iter
                 panel.y = y_iter
@@ -54,8 +53,8 @@ class Misplay( object ):
                 y_iter += self.margins
 
             if 0 == panel.w:
-                self.logger.debug( 'auto-setting panel width to {}'.format(
-                    parent_width ) )
+                self.logger.debug( 'auto-setting panel width to %d',
+                    parent_width )
                 panel.w = parent_width
 
             last_width = panel.w
@@ -76,7 +75,7 @@ class Misplay( object ):
 
     def blank( self, x, y, w, h, draw, fill ):
         pass
-    
+
     def text( self, text, font_family, font_size, position, erase ):
         pass
 
@@ -88,18 +87,16 @@ class Misplay( object ):
             seconds = int( time.time() )
             elapsed = seconds - self.last_update
             self.last_update = int( time.time() )
-            self.logger.debug( '{} seconds elapsed'.format( elapsed ) )
+            self.logger.debug( '%d seconds elapsed', elapsed )
 
             try:
                 self._update_panels( self.panels, elapsed )
 
                 self.flip()
-            except Exception as exc:
+            except Exception as exc: # pylint: disable=broad-except
                 self.logger.error( '%s during refresh: %s', type( exc ), exc )
 
             # Sleep.
             self.logger.debug(
-                'sleeping for {} seconds...'.format( self.refresh ) )
+                'sleeping for %d seconds...', self.refresh )
             time.sleep( self.refresh )
-
-

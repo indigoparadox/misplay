@@ -7,6 +7,8 @@ class MisplayPanel( object ):
             int( kwargs['width'] ) if 'width' in kwargs else 0
         self.h = int( kwargs['h'] ) if 'h' in kwargs else \
             int( kwargs['height'] ) if 'height' in kwargs else 0
+        self.logger = logging.getLogger( 'panel' )
+        self.logger_loop = logging.getLogger( 'loop.panel' )
 
         # These will be set by the display.
         self.display = None
@@ -29,10 +31,9 @@ class TextPanel( MisplayPanel ):
     @property
     def display( self ):
         return self._display
-    
+
     @display.setter
     def display( self, value ):
-        logger = logging.getLogger( 'panel.text' )
 
         # Grab the display's font info if we don't have any.
         # TODO: Make pseudo-properties to do this on the fly.
@@ -46,28 +47,26 @@ class TextPanel( MisplayPanel ):
         self._display = value
         if self._display:
             new_h = self.panel_lines_height()
-            #logger.debug( 'setting height to: {}'.format( new_h ) )
+            self.logger.debug(
+                'setting height to: %d', new_h )
             self.h = new_h
 
     def line_height( self, line_idx=0 ):
-        logger = logging.getLogger( 'panel.text.height.line' )
         text_sz = self.display.text(
             None, self.font_family, self.font_size, None )
-        #logger.debug( '{} line {} height: {}'.format( type( self ), line_idx,
-        #    text_sz[1] ) )
+        self.logger_loop.debug( '%s line %d height: %d',
+            type( self ), line_idx, text_sz[1] )
         return text_sz[1]
 
     def panel_lines_height( self, through=-1 ):
-        logger = logging.getLogger( 'panel.text.height' )
         height_out = 0
         if 0 > through:
             through = self.lines
-        #through += 1
         for line in range( through ):
             height_out += self.line_height( line )
         margins_out = (self.display.margins * through)
-        #logger.debug( '{} height for {} lines: {} + {}'.format(
-        #    type( self ), through, height_out, margins_out ) )
+        self.logger_loop.debug( '%s height for %d lines: %d + %d',
+            type( self ), through, height_out, margins_out )
         return height_out + margins_out
 
     def text( self, text, line=0, blank=False, font_fam=None, font_sz=0 ):
@@ -78,14 +77,13 @@ class TextPanel( MisplayPanel ):
             font_sz = self.font_size
 
         # Figure out line offset.
-        margin = line * self.display.margins
         line_y = self.y + self.panel_lines_height( line )
         line_h = self.line_height( line )
         if blank:
             self.display.blank( self.x, line_y, self.w, line_h, fill=255 )
         self.display.text( text, font_fam, font_sz, (self.x, line_y) )
 
-    def update( self, elapsed ):
+    def update( self, elapsed ): # pylint: disable=unused-argument
         if self._static_text:
             self.text( self._static_text, 0 )
 
@@ -93,4 +91,3 @@ class RowsPanel( MisplayPanel ):
     def __init__( self, **kwargs ):
         super().__init__( **kwargs )
         self.rows = []
-

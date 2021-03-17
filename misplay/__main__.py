@@ -9,20 +9,15 @@ import logging
 from urllib.parse import urlparse
 from logging.handlers import SMTPHandler
 
-#from misplay.displays.misplay import RefreshException
-from misplay.panels.panel import RowsPanel, TextPanel
+from misplay.panels.panel import RowsPanel, TextPanel # pylint: disable=import-error
 
 @atexit.register
 def shutdown_display():
     global status
-
-    #logger = logging.getLogger( 'main' )
-
     try:
         status.stop()
-    except NameError:
-        #logger.error( e )
-        pass
+    except NameError as exc:
+        logging.getLogger( 'main' ).error( exc )
 
 def create_panels( config, panel_keys, parent=None ):
 
@@ -33,20 +28,20 @@ def create_panels( config, panel_keys, parent=None ):
         panel_cfg = dict( config.items( 'panel-{}'.format( key ) ) )
         panel =  None
         if 'wallpaper' == panel_cfg['panel']:
-            from misplay.panels.wallpaper import WallpaperPanel
+            from misplay.panels.wallpaper import WallpaperPanel # pylint: disable=import-error
             panel = WallpaperPanel( **panel_cfg )
         elif 'time' == panel_cfg['panel']:
-            from misplay.panels.time import TimePanel
+            from misplay.panels.time import TimePanel # pylint: disable=import-error
             panel = TimePanel( **panel_cfg )
         elif 'rows' == panel_cfg['panel']:
             panel = RowsPanel( **panel_cfg )
             child_keys = panel_cfg['rows'].split( ',' )
             create_panels( config, child_keys, panel.rows )
         elif 'ipc' == panel_cfg['panel']:
-            from misplay.panels.ipc import IPCPanel
+            from misplay.panels.ipc import IPCPanel # pylint: disable=import-error
             panel = IPCPanel( **panel_cfg )
         elif 'mpd' == panel_cfg['panel']:
-            from misplay.panels.mpd import MPDPanel
+            from misplay.panels.mpd import MPDPanel # pylint: disable=import-error
             panel = MPDPanel( **panel_cfg )
         elif 'text' == panel_cfg['panel']:
             panel = TextPanel( **panel_cfg )
@@ -65,7 +60,7 @@ def create_misplay( config ):
     del display_cfg['columns']
 
     # TODO: Make this modular.
-    from misplay.displays.epd2in13 import EPD2in13
+    from misplay.displays.epd2in13 import EPD2in13 # pylint: disable=import-error
 
     return EPD2in13( **display_cfg )
 
@@ -130,8 +125,7 @@ def main():
             do_reload = True
 
 if '__main__' == __name__:
-    logger = logging.getLogger( 'main' )
     try:
         main()
     except RuntimeError as exc:
-        logger.error( '%s: %s', type( exc ), exc )
+        logging.getLogger( 'main' ).error( '%s: %s', type( exc ), exc )

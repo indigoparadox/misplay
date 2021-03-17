@@ -5,4 +5,3 @@ class MisplaySource( object ):
 
     def poll( self ):
         return None
-

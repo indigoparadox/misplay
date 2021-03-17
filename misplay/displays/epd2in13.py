@@ -1,10 +1,10 @@
 
-from .misplay import Misplay
-from PIL import Image, ImageFont, ImageDraw
-import misplay.displays.drivers.epd2in13 as epd2in13
 import logging
-import random
-import os
+
+from PIL import Image, ImageFont, ImageDraw
+
+import misplay.displays.drivers.epd2in13 as epd2in13 # pylint: disable=import-error
+from misplay.displays import Misplay # pylint: disable=import-error
 
 class EPD2in13( Misplay ):
 
@@ -28,7 +28,7 @@ class EPD2in13( Misplay ):
 
     def image( self, path, pos=(0, 0), width=80, height=100, erase=True ):
         self.epd.init( self.epd.lut_partial_update )
-  
+
         bmp = Image.open( path )
         bmp.thumbnail( (width, height) )
         draw = ImageDraw.Draw( self.canvas )
@@ -72,6 +72,5 @@ class EPD2in13( Misplay ):
     def flip( self ):
 
         self.epd.display( self.epd.getbuffer( self.canvas.rotate( self.rotate ) ) )
-         
-        #self.epd.sleep()
 
+        #self.epd.sleep()

@@ -2,8 +2,9 @@
 import random
 import os
 import logging
-# XXX
-from PIL import Image, ImageFont, ImageDraw
+
+from PIL import ImageDraw
+
 from .panel import MisplayPanel
 
 class WallpaperPanel( MisplayPanel ):
@@ -13,9 +14,9 @@ class WallpaperPanel( MisplayPanel ):
         self.path = kwargs['path']
         self.wp_countup = int( kwargs['interval'] )
         self.wp_int = int( kwargs['interval'] )
+        self.logger = logging.getLogger( 'wallpaper' )
 
     def update( self, elapsed ):
-        logger = logging.getLogger( 'wallpaper.update' )
 
         # Change the image on wallpapers-interval seconds.
         self.wp_countup += elapsed
@@ -25,7 +26,7 @@ class WallpaperPanel( MisplayPanel ):
             while '.' == entry_path[0]:
                 entry_iter = random.choice( os.listdir( self.path ) )
                 entry_path = os.path.join( self.path, entry_iter )
-            logger.debug( 'selecting image: {}'.format( entry_path ) )
+            self.logger.debug( 'selecting image: %s', entry_path )
 
             # Blackout the image area to prevent artifacts.
             draw = ImageDraw.Draw( self.display.canvas )
@@ -37,6 +38,5 @@ class WallpaperPanel( MisplayPanel ):
             # Draw the new wallpaper.
             self.display.image( entry_path, height=self.h )
         else:
-            logger.debug(
-                '{} until wp change'.format( self.wp_int - self.wp_countup ) )
-
+            self.logger.debug(
+                '%d until wp change', self.wp_int - self.wp_countup )
