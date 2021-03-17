@@ -6,15 +6,11 @@ import configparser
 import argparse
 import socket
 import logging
+from importlib import import_module
 from urllib.parse import urlparse
 from logging.handlers import SMTPHandler
 
 from misplay.panels.panel import RowsPanel, TextPanel # pylint: disable=import-error
-
-try:
-    import misplay.buttons
-except ImportError as exc:
-    logging.getLogger( 'main' ).error( 'while setting up buttons: %s', exc )
 
 @atexit.register
 def shutdown_display():
@@ -102,6 +98,11 @@ def main():
 
     config = configparser.ConfigParser()
     config.read( ini_path )
+
+    try:
+        buttons_module = import_module( config.get( 'buttons', 'module' ) )
+    except (ImportError, configparser.NoOptionError, configparser.NoSectionError) as exc:
+        logger.error( 'while setting up buttons: %s', exc )
 
     try:
         if config.getboolean( 'reporter', 'enable' ):
