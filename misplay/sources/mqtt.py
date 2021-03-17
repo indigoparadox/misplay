@@ -2,7 +2,7 @@
 import logging
 import ssl
 from paho.mqtt import client as mqtt_client
-from misplay.sources.source import MisplaySource # pylint: disable=import-error
+from misplay.sources import MisplaySource # pylint: disable=import-error
 
 class MQTTSource( MisplaySource ):
 

@@ -4,7 +4,7 @@ import os
 import time
 import errno
 import threading
-from misplay.sources.source import MisplaySource # pylint: disable=import-error
+from misplay.sources import MisplaySource # pylint: disable=import-error
 
 class FIFOThread( threading.Thread ):
     def __init__( self, source ):

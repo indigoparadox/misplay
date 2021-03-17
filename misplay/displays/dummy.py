@@ -1,5 +1,5 @@
 
-from .misplay import Misplay
+from misplay.displays import Misplay
 from PIL import Image, ImageFont, ImageDraw
 import logging
 import random
