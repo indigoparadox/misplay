@@ -1,5 +1,8 @@
 *.pyc
 *.swp
+*.egg-info
+build
+dist
 wallpapers
 misplay.ini
 __pycache__
