@@ -28,7 +28,7 @@ class MPDPanel( TextPanel ):
         if self.last_song != mpsong['title']:
             song_changed = True
             self.last_song = mpsong['title']
-        self.text( mpsong['title'], 0, blank=song_changed )
+        self.text( mpsong['title'], 0 )
 
         # Show player status.
         mpstatus = self._mpd_command( self.mpc.status ) # pylint: disable=no-member
@@ -38,6 +38,6 @@ class MPDPanel( TextPanel ):
         elif 'pause' == mpstatus['state']:
             mpstate = 'Paused'
 
-        self.text( '{}/{} {}'.format(
-            mpstatus['time'], mpstatus['duration'], mpstate ), 1,
-            blank=song_changed )
+        self.text( '{} ({})'.format( mpstate, mpstatus['duration'] ), 1 )
+        #self.text( '{}/{} {}'.format(
+        #    mpstatus['time'], mpstatus['duration'], mpstate ), 1 )

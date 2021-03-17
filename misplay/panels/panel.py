@@ -1,5 +1,6 @@
 
 import logging
+import traceback
 
 class MisplayPanel( object ):
     def __init__( self, **kwargs ):
@@ -20,13 +21,21 @@ class MisplayPanel( object ):
 
 class TextPanel( MisplayPanel ):
     def __init__( self, **kwargs ):
-        #width=0, height=0, font=None, size=0, lines=1, text=None, panel=None ):
         super().__init__( **kwargs )
         self.lines = int( kwargs['lines'] ) if 'lines' in kwargs else 1
         self.font_family = kwargs['font'] if 'font' in kwargs else None
         self.font_size = int( kwargs['size'] ) if 'size' in kwargs else 0
         self._display = None
         self._static_text = kwargs['text'] if 'text' in kwargs else None
+
+    @property
+    def lines( self ):
+        return self._lines
+
+    @lines.setter
+    def lines( self, value ):
+        self._lines = value
+        self._last_text = ['' for i in range( self._lines )]
 
     @property
     def display( self ):
@@ -69,7 +78,7 @@ class TextPanel( MisplayPanel ):
             type( self ), through, height_out, margins_out )
         return height_out + margins_out
 
-    def text( self, text, line=0, blank=False, font_fam=None, font_sz=0 ):
+    def text( self, text, line=0, font_fam=None, font_sz=0 ):
         # Use panel font size by default.
         if not font_fam:
             font_fam = self.font_family
@@ -79,9 +88,13 @@ class TextPanel( MisplayPanel ):
         # Figure out line offset.
         line_y = self.y + self.panel_lines_height( line )
         line_h = self.line_height( line )
-        if blank:
+        if text != self._last_text[line]:
+            #traceback.print_stack()
+            # The call to display.text() will notify the display it's been
+            # updated.
+            self._last_text[line] = text
             self.display.blank( self.x, line_y, self.w, line_h, fill=255 )
-        self.display.text( text, font_fam, font_sz, (self.x, line_y) )
+            self.display.text( text, font_fam, font_sz, (self.x, line_y) )
 
     def update( self, elapsed ): # pylint: disable=unused-argument
         if self._static_text:

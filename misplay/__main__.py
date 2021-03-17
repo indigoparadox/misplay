@@ -91,6 +91,8 @@ def main():
     else:
         logging.basicConfig( level=logging.INFO )
 
+    logging.getLogger( 'mpd.base' ).setLevel( logging.ERROR )
+
     do_reload = True
     logger = logging.getLogger( 'main' )
     ini_path = os.path.join( os.path.dirname(

@@ -70,13 +70,13 @@ class Misplay( object ):
     def clear( self ):
         pass
 
-    def image( self, path, pos, width, height, erase ):
+    def image( self, path, pos, width, height ):
         pass
 
-    def blank( self, x, y, w, h, draw, fill ):
+    def blank( self, x, y, w, h, fill ):
         pass
 
-    def text( self, text, font_family, font_size, position, erase ):
+    def text( self, text, font_family, font_size, position ):
         pass
 
     def flip( self ):

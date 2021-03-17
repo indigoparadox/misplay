@@ -49,7 +49,7 @@ class IPCPanel( TextPanel ):
                 self.last_msg = self.messages[0]['msg']
                 logger.debug(
                     'displaying message: %s', self.messages[0]['msg'] )
-                self.text( self.messages[0]['msg'], 0, blank=True )
+                self.text( self.messages[0]['msg'], 0 )
                 logger.debug(
                     'reset countup from %d to 0', self.countup )
                 self.countup = 0
@@ -61,6 +61,6 @@ class IPCPanel( TextPanel ):
                     'message expired at %d, removing. %d left.',
                         self.countup, len( self.messages ) - 1 )
                 self.messages.pop( 0 )
-                self.text( ' ', blank=True )
+                self.text( ' ' )
 
             self.countup += elapsed
