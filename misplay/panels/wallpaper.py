@@ -28,15 +28,8 @@ class WallpaperPanel( MisplayPanel ):
                 entry_path = os.path.join( self.path, entry_iter )
             self.logger.debug( 'selecting image: %s', entry_path )
 
-            # Blackout the image area to prevent artifacts.
-            draw = ImageDraw.Draw( self.display.canvas )
-            self.display.blank( 0, 0, self.w, self.h, draw, 0 )
-            self.display.flip()
-            self.display.blank( 0, 0, self.w, self.h, draw, 255 )
-            self.display.flip()
-
             # Draw the new wallpaper.
-            self.display.image( entry_path, height=self.h )
+            self.display.image( entry_path, pos=(self.x, self.y), height=self.h )
         else:
             self.logger.debug(
                 '%d until wp change', self.wp_int - self.wp_countup )
