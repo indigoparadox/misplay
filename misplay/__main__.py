@@ -11,6 +11,11 @@ from logging.handlers import SMTPHandler
 
 from misplay.panels.panel import RowsPanel, TextPanel # pylint: disable=import-error
 
+try:
+    import misplay.buttons
+except ImportError as exc:
+    logging.getLogger( 'main' ).error( 'while setting up buttons: %s', exc )
+
 @atexit.register
 def shutdown_display():
     global status
